@@ -46,9 +46,9 @@ if (isset($error)) {
     <select name="student_id" required>
         <option value="">-- Select Student --</option>
         <?php
-        $students = $conn->query("SELECT id, name FROM students ORDER BY name");
+        $students = $conn->query("SELECT sid, name FROM students ORDER BY name");
         while ($row = $students->fetch_assoc()) {
-            echo "<option value='{$row['id']}'>{$row['name']}</option>";
+            echo "<option value='{$row['sid']}'>{$row['name']}</option>";
         }
         ?>
     </select>
