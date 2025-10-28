@@ -2,9 +2,7 @@
         background-color: #edeceb;
         font-family: "Newsreader", serif;
         font-weight: 500;
-        margin-bottom: 40px;
     }
-
     .header{
         background-color: #ffffff;
         display: flex;
@@ -62,6 +60,7 @@
         display:flex;
         flex-direction: column;
         align-items: center;
+        padding-bottom: 200px;
     }
     .titleBox{
         margin-top: 40px;
@@ -80,6 +79,12 @@
     .bodyImage{
         height: 500px;
         width: 500px;  
+        border-radius: 12px;
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+    }
+    .bodyImage1{
+        height: 300px;
+        width: 300px;  
         border-radius: 12px;
         box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
     }
@@ -193,7 +198,7 @@
     color: white;
 }
 .footerText a:hover{
-    color: #e46e0e;
+    color: #000000;
     text-decoration: underline;
 }
 .highlight{
@@ -205,5 +210,5 @@
     color: #6667ab;
 }
 .subtitles{
-    color: #d7d70d;
+    color: #aaaaa9;
 }
