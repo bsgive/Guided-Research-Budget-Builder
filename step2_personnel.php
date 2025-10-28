@@ -23,41 +23,71 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Step 2 - Personnel</title>
+<meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Home — My Website</title>
+    <link rel="stylesheet" href="stylesheets.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap" rel="stylesheet">
 </head>
 <body>
-<h2>Step 2: Personnel Information</h2>
-<form action="step2_personnel.php" method="POST">
+        <div class = "header">
+        <div class ="budgets">
+            <img src="assets/logo.png" alt="Logo" class="Logo">
+            <p class="budgetsText">Research Budget Builder</p>
+        </div>
 
-    <label>Principal Investigator (PI):</label>
-    <select name="pi_id" required>
-        <option value="">-- Select PI --</option>
-        <?php
-        // Fetch faculty list
-        $faculty = $conn->query("SELECT id, name FROM faculty_staff ORDER BY name");
-        while ($row = $faculty->fetch_assoc()) {
-            echo "<option value='{$row['id']}'>{$row['name']}</option>";
-        }
-        ?>
-    </select>
+        <div class="nav-links">
+            <a class="link" href="index.html">Home</a>
+            <a class="link" href="features.html">Features</a>
+            <a class="link" href="about.html">About</a>
+            <a class="link" href="contact.html">Contact</a>
+        </div>
+    </div>
+    <h2>Step 2: Personnel Information</h2>
+    <div class="phpDoc">
+        <div class="phpDoc1">
+        <form action="step2_personnel.php" method="POST">
 
-    <label>Effort (%) Year 1:</label>
-    <input type="number" name="effort_y1" min="0" max="100" required>
-
-    <label>Effort (%) Year 2:</label>
-    <input type="number" name="effort_y2" min="0" max="100" required>
-
-    <label>Effort (%) Year 3:</label>
-    <input type="number" name="effort_y3" min="0" max="100" required>
-
-    <label>Effort (%) Year 4:</label>
-    <input type="number" name="effort_y4" min="0" max="100" required>
-
-    <label>Effort (%) Year 5:</label>
-    <input type="number" name="effort_y5" min="0" max="100" required>
-
-    <br><br>
-    <button type="submit">Next →</button>
+        <label>Principal Investigator (PI):</label>
+        <select name="pi_id" required>
+            <option value="">-- Select PI --</option>
+            <?php
+            // Fetch faculty list
+            $faculty = $conn->query("SELECT id, name FROM faculty_staff ORDER BY name");
+            while ($row = $faculty->fetch_assoc()) {
+                echo "<option value='{$row['id']}'>{$row['name']}</option>";
+            }
+            ?>
+        </select>
+        </div>
+        <div class=phpDoc2>
+            <div>
+            <label>Effort (%) Year 1:</label>
+            <input type="number" name="effort_y1" min="0" max="100" required>
+            </div>
+            <div>
+            <label>Effort (%) Year 2:</label>
+            <input type="number" name="effort_y2" min="0" max="100" required>
+            </div>
+            <div>
+            <label>Effort (%) Year 3:</label>
+            <input type="number" name="effort_y3" min="0" max="100" required>
+            </div>
+            <div>
+            <label>Effort (%) Year 4:</label>
+            <input type="number" name="effort_y4" min="0" max="100" required>
+            </div>
+            <div>
+            <label>Effort (%) Year 5:</label>
+            <input type="number" name="effort_y5" min="0" max="100" required>
+            </div>
+  
+        </div>
+            <br><br>
+            <button type="submit">Next →</button>
+    </div>
 </form>
 </body>
 </html>

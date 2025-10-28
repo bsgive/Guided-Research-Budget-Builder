@@ -1,7 +1,12 @@
-    body{
+        body{
         background-color: #edeceb;
         font-family: "Newsreader", serif;
         font-weight: 500;
+    }
+    h2{
+        text-align: center;
+        font-size: 36px;
+        margin-top: 40px;
     }
     .header{
         background-color: #ffffff;
@@ -202,13 +207,60 @@
     text-decoration: underline;
 }
 .highlight{
-    color: #6667ab;
-    font-weight: 800;
-    text-shadow: 2px 2px 3px black;
+    margin-right: 10px;
+     font-weight: bold;
+     color: #8f53dd;
 } 
-.highlight2{
-    color: #6667ab;
-}
 .subtitles{
     color: #aaaaa9;
+}
+.aboutText{
+    padding: 40px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    padding: 60px;
+    margin-left: 20%;
+    margin-right: 20%;
+    font-size: 30px;
+}
+.phpDoc{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 40px auto;
+    margin-left: 20%;
+    margin-right: 20%;
+    font-size: 20px;
+    padding: 40px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    gap: 30px;
+
+}
+.phpDoc1{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 40px auto;
+    margin-left:    10%;
+    margin-right: 10%;
+    font-size: 20px;
+    padding: 40px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    gap: 30px;
+
+}
+.phpDoc2{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }

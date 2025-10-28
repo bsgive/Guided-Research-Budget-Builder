@@ -24,18 +24,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Step 4 - Travel</title>
+<meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Home — My Website</title>
+    <link rel="stylesheet" href="stylesheets.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap" rel="stylesheet">
 </head>
 <body>
-<h2>Step 4: Travel Planning</h2>
+            <div class = "header">
+        <div class ="budgets">
+            <img src="assets/logo.png" alt="Logo" class="Logo">
+            <p class="budgetsText">Research Budget Builder</p>
+        </div>
 
+        <div class="nav-links">
+            <a class="link" href="index.html">Home</a>
+            <a class="link" href="features.html">Features</a>
+            <a class="link" href="about.html">About</a>
+            <a class="link" href="contact.html">Contact</a>
+        </div>
+    </div>  
+<h2>Step 4: Travel Planning</h2>
+<div class="phpDoc2">
 <?php
 if (isset($error)) {
     echo "<p class='error'>$error</p>";
 }
 ?>
-
-<form action="step4_travel.php" method="POST">
+<div class="phpDoc1">
+    <form action="step4_travel.php" method="POST">
 
     <label for="travel_type">Destination Type:</label>
     <select name="travel_type" id="travel_type" required>
@@ -56,8 +75,9 @@ if (isset($error)) {
 
     <br><br>
     <button type="submit">Next →</button>
-</form>
-
+    </form>
+    </div>
+</div>
 </body>
 </html>
 

@@ -30,11 +30,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Step 3 - Student Support</title>
+<meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Home — My Website</title>
+    <link rel="stylesheet" href="stylesheets.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap" rel="stylesheet">
 </head>
 <body>
-<h2>Step 3: Student Appointments</h2>
+            <div class = "header">
+        <div class ="budgets">
+            <img src="assets/logo.png" alt="Logo" class="Logo">
+            <p class="budgetsText">Research Budget Builder</p>
+        </div>
 
+        <div class="nav-links">
+            <a class="link" href="index.html">Home</a>
+            <a class="link" href="features.html">Features</a>
+            <a class="link" href="about.html">About</a>
+            <a class="link" href="contact.html">Contact</a>
+        </div>
+    </div>
+<h2>Step 3: Student Appointments</h2>
+<div class="phpDoc">
 <?php
 if (isset($error)) {
     echo "<p style='color:red;'>$error</p>";
@@ -59,5 +78,6 @@ if (isset($error)) {
     <br><br>
     <button type="submit">Next →</button>
 </form>
+</div>
 </body>
 </html>

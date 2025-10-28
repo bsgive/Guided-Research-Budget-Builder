@@ -27,44 +27,67 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Step 1 - Project Plan</title>
+<meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Home — My Website</title>
+    <link rel="stylesheet" href="stylesheets.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap" rel="stylesheet">
 </head>
 <body>
-<h2>Step 1: Project Plan</h2>
+    <div class = "header">
+        <div class ="budgets">
+            <img src="assets/logo.png" alt="Logo" class="Logo">
+            <p class="budgetsText">Research Budget Builder</p>
+        </div>
 
-<?php
-if (isset($error)) {
-    echo "<p class='error'>$error</p>";
-}
-?>
+        <div class="nav-links">
+            <a class="link" href="index.html">Home</a>
+            <a class="link" href="features.html">Features</a>
+            <a class="link" href="about.html">About</a>
+            <a class="link" href="contact.html">Contact</a>
+        </div>
+    </div>
+    <h2>Step 1: Project Plan</h2>
+<div class="phpDoc1">
 
-<form action="step1_plan.php" method="POST">
-
-    <label for="title">Project Title:</label>
-    <input type="text" id="title" name="title" required>
-
-    <label for="pi_id">Principal Investigator (PI):</label>
-    <select id="pi_id" name="pi_id" required>
-        <option value="">-- Select PI --</option>
+    <div>
         <?php
-        $faculty = $conn->query("SELECT id, name FROM faculty_staff ORDER BY name");
-        while ($row = $faculty->fetch_assoc()) {
-            echo "<option value='{$row['id']}'>{$row['name']}</option>";
+        if (isset($error)) {
+            echo "<p class='error'>$error</p>";
         }
         ?>
-    </select>
 
-    <label for="start_year">Start Year:</label>
-    <select id="start_year" name="start_year" required>
-        <?php
-        $current_year = date("Y");
-        for ($i = 0; $i < 5; $i++) {
-            $year = $current_year + $i;
-            echo "<option value='$year'>$year</option>";
-        }
-        ?>
-    </select>
-
+        <form action="step1_plan.php" method="POST">
+            <label for="title">Project Title:</label>
+            <input type="text" id="title" name="title" required>
+    </div>
+    <div>
+        <label for="pi_id">Principal Investigator (PI):</label>
+        <select id="pi_id" name="pi_id" required>
+            <option value="">-- Select PI --</option>
+            <?php
+            $faculty = $conn->query("SELECT id, name FROM faculty_staff ORDER BY name");
+            while ($row = $faculty->fetch_assoc()) {
+                echo "<option value='{$row['id']}'>{$row['name']}</option>";
+            }
+            ?>
+        </select>
+    </div>
+    <div>
+        <label for="start_year">Start Year:</label>
+        <select id="start_year" name="start_year" required>
+            <?php
+            $current_year = date("Y");
+            for ($i = 0; $i < 5; $i++) {
+                $year = $current_year + $i;
+                echo "<option value='$year'>$year</option>";
+            }
+            ?>
+        </select>
+    </div>
+    <div>
     <label for="duration">Project Duration (Years):</label>
     <select id="duration" name="duration" required>
         <?php
@@ -73,13 +96,14 @@ if (isset($error)) {
         }
         ?>
     </select>
-
-    <label for="description">Project Description / Notes (optional):</label>
+    </div>
+    <label for="description">Project Description (optional):</label>
     <textarea id="description" name="description" rows="4" cols="40"></textarea>
 
     <br><br>
     <button type="submit">Next →</button>
-</form>
 
+</form>
+</div>
 </body>
 </html>
