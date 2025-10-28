@@ -2,6 +2,7 @@
         background-color: #edeceb;
         font-family: "Newsreader", serif;
         font-weight: 500;
+        margin-bottom: 40px;
     }
 
     .header{
@@ -90,10 +91,19 @@
         margin-top: 26px;
         gap: 50px;
     }
+    .underTitle2{
+        display:flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 26px;
+        gap: 50px;
+    }
     .list{
         display:flex;
         flex-direction: column;
         align-items: center;
+        justify-content:center;
         font-size: 24px;
         padding: 40px;
         background-color: #ffffff;
@@ -193,4 +203,7 @@
 } 
 .highlight2{
     color: #6667ab;
+}
+.subtitles{
+    color: #d7d70d;
 }
