@@ -33,13 +33,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Home — My Website</title>
-    <link rel="stylesheet" href="stylesheets.css" />
+    <link rel="stylesheet" href="stylesheets.css?v=2" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap" rel="stylesheet">
 </head>
 <body>
-            <div class = "header">
+    <div class = "header">
         <div class ="budgets">
             <img src="assets/logo.png" alt="Logo" class="Logo">
             <p class="budgetsText">Research Budget Builder</p>
@@ -52,32 +52,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <a class="link" href="contact.html">Contact</a>
         </div>
     </div>
-<h2>Step 3: Student Appointments</h2>
-<div class="phpDoc">
-<?php
-if (isset($error)) {
-    echo "<p style='color:red;'>$error</p>";
-}
-?>
 
-<form action="step3_students.php" method="POST">
-    <label>Student:</label>
-    <select name="student_id" required>
-        <option value="">-- Select Student --</option>
+    <h2>Step 3: Student Appointments</h2>
+    <div class="phpDoc1">
         <?php
-        $students = $conn->query("SELECT sid, name FROM students ORDER BY name");
-        while ($row = $students->fetch_assoc()) {
-            echo "<option value='{$row['sid']}'>{$row['name']}</option>";
+        if (isset($error)) {
+            echo "<p style='color:red;'>$error</p>";
         }
         ?>
-    </select>
-
-    <label>FTE (max 50%):</label>
-    <input type="number" name="fte" max="50" min="0" required>
-
-    <br><br>
-    <button type="submit">Next →</button>
-</form>
-</div>
+            <form action="step3_students.php" method="POST" class="form-group">
+                <div class="form-entry">
+                    <label for="student_id">Student:</label>
+                    <select name="student_id" id="student_id" required>
+                        <option value="">-- Select Student --</option>
+                        <?php
+                        $students = $conn->query("SELECT sid, name FROM students ORDER BY name");
+                        while ($row = $students->fetch_assoc()) {
+                            echo "<option value='{$row['sid']}'>{$row['name']}</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="form-entry">
+                    <label>FTE (max 50%):</label>
+                    <input type="number" name="fte" max="50" min="0" required>
+                </div>
+                <div class="form-entry">
+                    <button type="submit" class="bottom">Next →</button>
+                </div>
+            </form>
+    </div>
 </body>
 </html>

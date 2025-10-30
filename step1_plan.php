@@ -65,47 +65,58 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <label for="title">Project Title:</label>
                 <input type="text" id="title" name="title" required>
             </div>
+            <div class="smallInputs">
+                <div class="form-entry">
+                    <label for="pi_id">Principal Investigator:</label>
+                    <select id="pi_id" name="pi_id" required>
+                        <option value="">-- Select PI --</option>
+                        <?php
+                        $faculty = $conn->query("SELECT id, name FROM faculty_staff ORDER BY name");
+                        while ($row = $faculty->fetch_assoc()) {
+                            echo "<option value='{$row['id']}'>{$row['name']}</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="form-entry">
+                    <label for="start_year">Start Year:</label>
+                    <select id="start_year" name="start_year" class="startYear"required>
+                        <?php
+                        $current_year = date("Y");
+                        for ($i = 0; $i < 5; $i++) {
+                            $year = $current_year + $i;
+                            echo "<option value='$year'>$year</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="form-entry">
+                    <label for="duration">Project Duration:</label>
+                    <select id="duration" name="duration" required>
+                        <?php
+                        for ($i = 1; $i <= 5; $i++) {
+                            echo "<option value='$i'>$i year(s)</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+            </div>
 
-            <div class="form-entry">
-                <label for="pi_id">Principal Investigator (PI):</label>
-                <select id="pi_id" name="pi_id" required>
-                    <option value="">-- Select PI --</option>
-                    <?php
-                    $faculty = $conn->query("SELECT id, name FROM faculty_staff ORDER BY name");
-                    while ($row = $faculty->fetch_assoc()) {
-                        echo "<option value='{$row['id']}'>{$row['name']}</option>";
-                    }
-                    ?>
-                </select>
-            </div>
-            <div class="form-entry">
-                <label for="start_year">Start Year:</label>
-                <select id="start_year" name="start_year" class="startYear"required>
-                    <?php
-                    $current_year = date("Y");
-                    for ($i = 0; $i < 5; $i++) {
-                        $year = $current_year + $i;
-                        echo "<option value='$year'>$year</option>";
-                    }
-                    ?>
-                </select>
-            </div>
-            <div class="form-entry">
-                <label for="duration">Project Duration (Years):</label>
-                <select id="duration" name="duration" required>
-                    <?php
-                    for ($i = 1; $i <= 5; $i++) {
-                        echo "<option value='$i'>$i year(s)</option>";
-                    }
-                    ?>
-                </select>
-            </div>
-            <div class ="form-entry description">
-                <label for="description">Project Description (optional):</label>
-                <textarea id="description" name="description" rows="4" cols="40"></textarea>
+            <div class = "rowInput">
+                <div class ="form-entry_description">
+                    <div>
+                        <label for="description">Project Description (optional):</label>
+                    </div>
+                    <div>
+                    <textarea id="description" name="description" rows="4" cols="40"></textarea>
+                    </div>
+                </div>
+                <div>
+                    <button type="submit" class="bottom">Next →</button>
+                </div>
             </div>
         </div>
-        <button type="submit">Next →</button>
+
         </form>
     </div>  
 </body>
