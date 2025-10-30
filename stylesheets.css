@@ -317,7 +317,7 @@
     max-width: 100px;
 }
 
-.phpDoc1 button[type="submit"] {
+.phpDoc1 button[type="submit"], .phpDoc1 button[type="button"] {
     cursor: pointer;
     background-color: #8f53dd;
     color: #ffffff;
@@ -333,7 +333,7 @@
     width: 40%;
 }
 
-.phpDoc1 button[type="submit"]:hover{
+.phpDoc1 button[type="submit"]:hover, .phpDoc1 button[type="button"]:hover{
     background-color: #5d11c0;
     box-shadow: 0 10px 16px rgba(0,0,0,0.25);
     transform: translateY(-2px);
@@ -344,9 +344,32 @@
     flex-direction: row;
     gap: 30px;
 }
-.phpDoc1 button[type="submit"], .bottom {
+.phpDoc1 button[type="submit"], .phpDoc1 button[type="button"], .bottom {
   display: block;
   width: auto;
   margin: 40px auto 0;
   padding: 14px 32px;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 20px 0;
+  font-size: 18px;
+  color: #2d2644;
+}
+
+ul li {
+  position: relative;
+  padding-left: 28px;
+  margin-bottom: 12px;
+}
+
+ul li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #8f53dd;
+  font-weight: bold;
+  font-size: 22px;
 }

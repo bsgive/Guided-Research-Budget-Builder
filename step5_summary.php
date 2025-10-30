@@ -93,71 +93,86 @@ if (isset($_POST['save'])) {
 <html>
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Budget Summary</title>
-<link rel="stylesheet" href="stylesheets.css" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Home — My Website</title>
+    <link rel="stylesheet" href="stylesheets.css?v=2" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap" rel="stylesheet">
 </head>
 <body>
-<div class="header">
-    <div class="budgets">
-        <img src="assets/logo.png" alt="Logo" class="Logo">
-        <p class="budgetsText">Research Budget Builder</p>
+    <div class = "header">
+        <div class ="budgets">
+            <img src="assets/logo.png" alt="Logo" class="Logo">
+            <p class="budgetsText">Research Budget Builder</p>
+        </div>
+
+        <div class="nav-links">
+            <a class="link" href="index.html">Home</a>
+            <a class="link" href="features.html">Features</a>
+            <a class="link" href="about.html">About</a>
+            <a class="link" href="contact.html">Contact</a>
+        </div>
     </div>
-</div>
 
-<h2>Step 5: Summary</h2>
+    <h2>Step 5: Summary</h2>
+    <div class="phpdoc1">
+        <?php if($message) echo $message; ?>
 
-<?php if($message) echo $message; ?>
-
-<h3>Project Plan</h3>
-<ul>
-    <li>Title: <?= htmlspecialchars($_SESSION['plan']['title'] ?? '') ?></li>
-    <li>PI: <?= htmlspecialchars($_SESSION['plan']['pi_id'] ?? '') ?></li>
-    <li>Start Year: <?= htmlspecialchars($_SESSION['plan']['start_year'] ?? '') ?></li>
-    <li>Duration: <?= htmlspecialchars($_SESSION['plan']['duration'] ?? '') ?> year(s)</li>
-    <li>Description: <?= htmlspecialchars($_SESSION['plan']['description'] ?? '') ?></li>
-</ul>
-
-<h3>Personnel</h3>
-<?php if(!empty($_SESSION['personnel'])): ?>
-<ul>
-<?php foreach($_SESSION['personnel'] as $p): ?>
-    <li>
-        <?= htmlspecialchars($p['name'] ?? 'Unnamed') ?> 
-        - Efforts: 
-        <?php
-        for ($i = 1; $i <= ($_SESSION['plan']['duration'] ?? 0); $i++) {
-            echo "Year $i: " . ($p["effort_y{$i}"] ?? 0) . "% ";
-        }
-        ?>
-    </li>
-<?php endforeach; ?>
-</ul>
-<?php endif; ?>
-
-<h3>Students</h3>
-<?php if(!empty($_SESSION['students'])): ?>
-<ul>
-<?php foreach($_SESSION['students'] as $s): ?>
-    <li>Student ID <?= htmlspecialchars($s['student_id']) ?> - FTE: <?= htmlspecialchars($s['fte']) ?></li>
-<?php endforeach; ?>
-</ul>
-<?php endif; ?>
-
-<h3>Travel</h3>
-<?php if(!empty($_SESSION['travel'])): ?>
-<ul>
-<?php foreach($_SESSION['travel'] as $t): ?>
-    <li>Type: <?= htmlspecialchars($t['travel_type']) ?>, Trips: <?= htmlspecialchars($t['trips']) ?>, Days: <?= htmlspecialchars($t['days']) ?></li>
-<?php endforeach; ?>
-</ul>
-<?php endif; ?>
-
-<form method="POST" action="step5_summary.php">
-    <button type="submit" name="save">💾 Save Budget</button>
-    <a href="index.html"><button type="button">🏠 Home</button></a>
-</form>
-
+        <div class="form-entry">
+        <h3>Project Plan</h3>
+        <ul>
+            <li>Title: <?= htmlspecialchars($_SESSION['plan']['title'] ?? '') ?></li>
+            <li>PI: <?= htmlspecialchars($_SESSION['plan']['pi_id'] ?? '') ?></li>
+            <li>Start Year: <?= htmlspecialchars($_SESSION['plan']['start_year'] ?? '') ?></li>
+            <li>Duration: <?= htmlspecialchars($_SESSION['plan']['duration'] ?? '') ?> year(s)</li>
+            <li>Description: <?= htmlspecialchars($_SESSION['plan']['description'] ?? '') ?></li>
+        </ul>
+        </div>
+        <div class="form-entry">
+        <h3>Personnel</h3>
+        <?php if(!empty($_SESSION['personnel'])): ?>
+        <ul>
+        <?php foreach($_SESSION['personnel'] as $p): ?>
+            <li>
+                <?= htmlspecialchars($p['name'] ?? 'Unnamed') ?> 
+                - Efforts: 
+                <?php
+                for ($i = 1; $i <= ($_SESSION['plan']['duration'] ?? 0); $i++) {
+                    echo "Year $i: " . ($p["effort_y{$i}"] ?? 0) . "% ";
+                }
+                ?>
+            </li>
+        <?php endforeach; ?>
+        </ul>
+        <?php endif; ?>
+        </div>
+        <div class="form-entry">
+        <h3>Students</h3>
+        <?php if(!empty($_SESSION['students'])): ?>
+        <ul>
+        <?php foreach($_SESSION['students'] as $s): ?>
+            <li>Student ID <?= htmlspecialchars($s['student_id']) ?> - FTE: <?= htmlspecialchars($s['fte']) ?></li>
+        <?php endforeach; ?>
+        </ul>
+        <?php endif; ?>
+        </div>
+        <div class="form-entry">
+        <h3>Travel</h3>
+        <?php if(!empty($_SESSION['travel'])): ?>
+        <ul>
+        <?php foreach($_SESSION['travel'] as $t): ?>
+            <li>Type: <?= htmlspecialchars($t['travel_type']) ?>, Trips: <?= htmlspecialchars($t['trips']) ?>, Days: <?= htmlspecialchars($t['days']) ?></li>
+        <?php endforeach; ?>
+        </ul>
+        <?php endif; ?>
+        </div>
+        <div class="form-entry">
+        <form method="POST" action="step5_summary.php">
+            <button type="submit" name="save">💾 Save Budget</button>
+        </form>
+        </div>
+    </div>
 </body>
 </html>
 
