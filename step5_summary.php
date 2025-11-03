@@ -5,8 +5,11 @@ include 'database.php';
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-$message = '';
+$message = $_SESSION['message'] ?? '';
+unset($_SESSION['message']);
 
+//$id = $_SESSION['personnel'][0]['id'] ?? null;
+//$name = $conn->query("SELECT name FROM faculty_staff where id = $id")->fetch_assoc()['name'] ?? 'Unnamed';
 
 if (isset($_POST['save'])) {
     if (empty($_SESSION['plan'])) {
@@ -83,8 +86,11 @@ if (isset($_POST['save'])) {
             $stmt->close();
         }
 
-        $message = "<p style='color:green;'>✅ Budget saved successfully!</p>";
         session_unset();
+        $_SESSION['message'] = "<p style='color:green;'>✅ Budget saved successfully!</p>";
+        header("Location: step5_summary.php?saved=1");
+        exit;
+
     }
 }
 ?>
@@ -123,7 +129,7 @@ if (isset($_POST['save'])) {
         <h3>Project Plan</h3>
         <ul>
             <li>Title: <?= htmlspecialchars($_SESSION['plan']['title'] ?? '') ?></li>
-            <li>PI: <?= htmlspecialchars($_SESSION['plan']['pi_id'] ?? '') ?></li>
+            <li>PI ID: <?= htmlspecialchars($_SESSION['personnel'][0]['id'] ?? '') ?></li>
             <li>Start Year: <?= htmlspecialchars($_SESSION['plan']['start_year'] ?? '') ?></li>
             <li>Duration: <?= htmlspecialchars($_SESSION['plan']['duration'] ?? '') ?> year(s)</li>
             <li>Description: <?= htmlspecialchars($_SESSION['plan']['description'] ?? '') ?></li>
@@ -135,7 +141,7 @@ if (isset($_POST['save'])) {
         <ul>
         <?php foreach($_SESSION['personnel'] as $p): ?>
             <li>
-                <?= htmlspecialchars($p['name'] ?? 'Unnamed') ?> 
+                <?= htmlspecialchars($p['name'] ?? 'Unnamed') ?>
                 - Efforts: 
                 <?php
                 for ($i = 1; $i <= ($_SESSION['plan']['duration'] ?? 0); $i++) {

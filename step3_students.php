@@ -12,17 +12,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
      
-        $_SESSION['students'][] = [
+        $_SESSION['students'] = [[
             'student_id' => $_POST['student_id'],
             'fte'        => $fte
-        ];
+        ]];
 
  
         header("Location: step4_travel.php");
         exit;
 
     } else {
-        $error = "Please select a student and enter FTE.";
+        $_SESSION['students'] = [];
+        header("Location: step4_travel.php");
+        exit;
     }
 }
 ?>
@@ -63,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <form action="step3_students.php" method="POST" class="form-group">
                 <div class="form-entry">
                     <label for="student_id">Student:</label>
-                    <select name="student_id" id="student_id" required>
+                    <select name="student_id" id="student_id">
                         <option value="">-- Select Student --</option>
                         <?php
                         $students = $conn->query("SELECT sid, name FROM students ORDER BY name");
@@ -75,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
                 <div class="form-entry">
                     <label>FTE (max 50%):</label>
-                    <input type="number" name="fte" max="50" min="0" required>
+                    <input type="number" name="fte" max="50" min="0">
                 </div>
                 <div class="form-entry">
                     <button type="submit" class="bottom">Next →</button>

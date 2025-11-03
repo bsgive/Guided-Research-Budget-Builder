@@ -6,17 +6,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if (!empty($_POST['travel_type']) && isset($_POST['trips']) && isset($_POST['days'])) {
 
-        $_SESSION['travel'][] = [
+        $_SESSION['travel'] = [[
             'travel_type' => $_POST['travel_type'],
             'trips'       => (int)$_POST['trips'],
             'days'        => (int)$_POST['days']
-        ];
+        ]];
 
         header("Location: step5_summary.php");
         exit;
 
     } else {
-        $error = "Please select a travel type and enter valid numbers.";
+
+        $_SESSION['travel'] = [];
+        header("Location: step5_summary.php");
+        exit;
     }
 }
 ?>
@@ -58,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <form action="step4_travel.php" method="POST" class="form-group">
         <div class="form-entry">
             <label for="travel_type">Destination Type:</label>
-            <select name="travel_type" id="travel_type" required>
+            <select name="travel_type" id="travel_type" >
                 <option value="">-- Select Travel Type --</option>
                 <?php
                 $profiles = $conn->query("SELECT id, type FROM travel_profiles ORDER BY type");
@@ -71,11 +74,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="smallInputs">
             <div class="form-entry">
                 <label for="trips">Number of Trips:</label>
-                <input type="number" id="trips" name="trips" min="0" required>
+                <input type="number" id="trips" name="trips" min="0" >
             </div>
             <div class ="form-entry">
                 <label for="days">Duration (days per trip):</label>
-                <input type="number" id="days" name="days" min="1" required>
+                <input type="number" id="days" name="days" min="1" >
             </div>
         </div>
         <div class ="form-entry">

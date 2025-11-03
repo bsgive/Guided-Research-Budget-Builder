@@ -1,4 +1,5 @@
 <?php
+session_unset();
 session_start();
 include 'database.php'; 
 
@@ -66,18 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <input type="text" id="title" name="title" required>
             </div>
             <div class="smallInputs">
-                <div class="form-entry">
-                    <label for="pi_id">Principal Investigator:</label>
-                    <select id="pi_id" name="pi_id" required>
-                        <option value="">-- Select PI --</option>
-                        <?php
-                        $faculty = $conn->query("SELECT id, name FROM faculty_staff ORDER BY name");
-                        while ($row = $faculty->fetch_assoc()) {
-                            echo "<option value='{$row['id']}'>{$row['name']}</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
+
                 <div class="form-entry">
                     <label for="start_year">Start Year:</label>
                     <select id="start_year" name="start_year" class="startYear"required>
