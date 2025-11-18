@@ -241,28 +241,43 @@
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.1);
     border-radius: 20px;
     gap: 30px;
-
 }
-.phpDoc1 .colInput{
+.phpDoc2{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 40px auto;
+    margin-left:    20%;
+    margin-right: 20%;
+    font-size: 20px;
+    padding: 40px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    gap: 30px;
+}
+.phpDoc1 .colInput,.phpDoc2 .colInput{
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 30px;
 }
 
-.phpDoc1 .form-group {
+.phpDoc1 .form-group, .phpDoc2 .form-group{
     display: flex;
     flex-direction: column;
     width: 500px;
     gap: 40px;
 }
-.phpDoc1 .form-entry_description{
+.phpDoc1 .form-entry_description, .phpDoc2 .form-entry_description{
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
-.phpDoc1 label {
+.phpDoc1 label , .phpDoc2 label{
     font-size: 18px;   
     font-weight: 600;
     color: #2d2644;
@@ -275,7 +290,7 @@
     gap: 30px;
     align-items: center;
 }
-.phpDoc1 input[type="text"], .phpDoc1 select, .phpDoc1 textarea, .phpDoc1 input[type="number"] {
+.phpDoc1 input[type="text"], .phpDoc1 select, .phpDoc1 textarea, .phpDoc1 input[type="number"], .phpDoc2 input[type="text"], .phpDoc2 select, .phpDoc2 textarea, .phpDoc2 input[type="number"]  {
     width: 100%;
     background-color: #f9f8ff;
     border: 2px solid #ccc;
@@ -287,15 +302,13 @@
     box-shadow: 0 4px 8px rgba(0,0,0,0.05);
     transition: all 0.18s ease;
 }
-.phpDoc1 input[type="text"]:focus,
-.phpDoc1 select:focus,
-.phpDoc1 textarea:focus {
+.phpDoc1 input[type="text"]:focus, .phpDoc1 select:focus, .phpDoc1 textarea:focus,.phpDoc2 input[type="text"]:focus, .phpDoc2 select:focus, .phpDoc2 textarea:focus {
     outline:auto;
     border-color: #8f53dd;
     box-shadow: 0 0 6px rgba(143, 83, 221, 0.6), 0 6px 12px rgba(0,0,0,0.15);
     background-color: #fff;
 }
-.phpDoc1 select {
+.phpDoc1 select, .phpDoc2 select{
     appearance: none;
     -webkit-appearance: none;
     background-image:
@@ -307,7 +320,7 @@
     background-repeat: no-repeat;
     padding-right: 30px;
 }
-.phpDoc1 textarea {
+.phpDoc1 textarea,.phpDoc2 textarea {
     min-height: 100px;
     min-width: 100px;;
     max-width: 300px;
@@ -317,7 +330,7 @@
     max-width: 100px;
 }
 
-.phpDoc1 button[type="submit"], .phpDoc1 button[type="button"] {
+.phpDoc1 button[type="submit"], .phpDoc1 button[type="button"],.phpDoc2 button[type="submit"], .phpDoc2 button[type="button"]  {
     cursor: pointer;
     background-color: #8f53dd;
     color: #ffffff;
@@ -333,18 +346,18 @@
     width: 40%;
 }
 
-.phpDoc1 button[type="submit"]:hover, .phpDoc1 button[type="button"]:hover{
+.phpDoc1 button[type="submit"]:hover, .phpDoc1 button[type="button"]:hover, .phpDoc2 button[type="submit"]:hover, .phpDoc2 button[type="button"]:hover{
     background-color: #5d11c0;
     box-shadow: 0 10px 16px rgba(0,0,0,0.25);
     transform: translateY(-2px);
 }
 
-.phpDoc1 .rowInput{
+.rowInput{
     display: flex;
     flex-direction: row;
     gap: 30px;
 }
-.phpDoc1 button[type="submit"], .phpDoc1 button[type="button"], .bottom {
+.phpDoc1 button[type="submit"], .phpDoc1 button[type="button"], .phpDoc2 button[type="submit"], .phpDoc2 button[type="button"],.bottom {
   display: block;
   width: auto;
   margin: 40px auto 0;
