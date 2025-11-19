@@ -88,7 +88,7 @@ if (isset($_POST['save'])) {
 
         session_unset();
         $_SESSION['message'] = "<p style='color:green;'>✅ Budget saved successfully!</p>";
-        header("Location: step5_summary.php?saved=1");
+        header("Location: calculate.php?budget_id=$budget_id");
         exit;
 
     }
