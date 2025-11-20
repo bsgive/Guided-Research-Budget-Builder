@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'database.php'; 
+include 'database.php';
 
 // Make sure step1 data exists
 if (!isset($_SESSION['plan'])) {
@@ -8,12 +8,12 @@ if (!isset($_SESSION['plan'])) {
     exit;
 }
 
-$duration = $_SESSION['plan']['duration']; 
+$duration = $_SESSION['plan']['duration'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $_SESSION['personnel'] = [];
     if (!empty($_POST['pi_id'])) {
-        $pi_id = (int)$_POST['pi_id'];
+        $pi_id = (int) $_POST['pi_id'];
         $stmt = $conn->prepare("SELECT name FROM faculty_staff WHERE id = ?");
         $stmt->bind_param("i", $pi_id);
         $stmt->execute();
@@ -30,12 +30,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             'effort_y4' => $_POST['effort_y4'] ?? 0,
             'effort_y5' => $_POST['effort_y5'] ?? 0,
         ];
-         $_SESSION['plan']['pi_id'] = $_POST['pi_id'];
+        $_SESSION['plan']['pi_id'] = $_POST['pi_id'];
     }
     if (!empty($_POST['co_pis']) && is_array($_POST['co_pis'])) {
         foreach ($_POST['co_pis'] as $c) {
-            if (empty($c['id'])) continue;
-            $co_id = (int)$c['id'];
+            if (empty($c['id']))
+                continue;
+            $co_id = (int) $c['id'];
             $stmt = $conn->prepare("SELECT name FROM faculty_staff WHERE id = ?");
             $stmt->bind_param("i", $co_id);
             $stmt->execute();
@@ -63,14 +64,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <!DOCTYPE html>
 <html>
+
 <head>
-<script>
-function addCoPI() {
-    const container = document.getElementById('co_pi_container');
-    const index = container.children.length;
-    const duration = <?php echo $duration; ?>;
-    
-    let html = `<div class="co_pi_block">
+    <script>
+        function addCoPI() {
+            const container = document.getElementById('co_pi_container');
+            const index = container.children.length;
+            const duration = <?php echo $duration; ?>;
+
+            let html = `<div class="co_pi_block">
         <label>Co-PI:</label>
         <select name="co_pis[${index}][id]" required>
             <option value="">-- Select Co-PI --</option>
@@ -81,29 +83,32 @@ function addCoPI() {
             }
             ?>
         </select>`;
-    
-    for (let i = 1; i <= duration; i++) {
-        html += `<label>Effort Year ${i} (%)</label>
+
+            for (let i = 1; i <= duration; i++) {
+                html += `<label>Effort Year ${i} (%)</label>
                  <input type="number" name="co_pis[${index}][effort_y${i}]" min="0" max="100" required>`;
-    }
-    
-    html += `<button type="button" onclick="this.parentElement.remove()">Remove Co-PI</button>
+            }
+
+            html += `<button type="button" onclick="this.parentElement.remove()">Remove Co-PI</button>
     </div>`;
-    
-    container.insertAdjacentHTML('beforeend', html);
-}
-</script>
-<meta charset="utf-8" />
+
+            container.insertAdjacentHTML('beforeend', html);
+        }
+    </script>
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Home — My Website</title>
     <link rel="stylesheet" href="stylesheets.css?v=2" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
-        <div class = "header">
-        <div class ="budgets">
+    <div class="header">
+        <div class="budgets">
             <img src="assets/logo.png" alt="Logo" class="Logo">
             <p class="budgetsText">Research Budget Builder</p>
         </div>
@@ -117,41 +122,40 @@ function addCoPI() {
     </div>
     <h2>Step 2: Personnel Information</h2>
     <form action="step2_personnel.php" method="POST">
-    <div class="phpDoc1">
-        <div class="form-group">
-            <h2>Step 2: Personnel Information</h2>
-            <label>Principal Investigator (PI):</label>
-            <select name="pi_id" required>
-                <option value="">-- Select PI --</option>
-                <?php
-                $faculty = $conn->query("SELECT id, name FROM faculty_staff ORDER BY name");
-                while ($row = $faculty->fetch_assoc()) {
-                    echo "<option value='{$row['id']}'>{$row['name']}</option>";
-                }
-                ?>
-            </select>
+        <div class="phpDoc1">
+            <div class="form-group">
+                <h2>Step 2: Personnel Information</h2>
+                <label>Principal Investigator (PI):</label>
+                <select name="pi_id" required>
+                    <option value="">-- Select PI --</option>
+                    <?php
+                    $faculty = $conn->query("SELECT id, name FROM faculty_staff ORDER BY name");
+                    while ($row = $faculty->fetch_assoc()) {
+                        echo "<option value='{$row['id']}'>{$row['name']}</option>";
+                    }
+                    ?>
+                </select>
 
-            <div class="smallInputs">
-                <?php for ($i = 1; $i <= $duration; $i++): ?>
-                    <div class="form-entry">
-                        <label>Effort (%) Year <?= $i ?>:</label>
-                        <input type="number" name="effort_y<?= $i ?>" min="0" max="100" required>
-                    </div>
-                <?php endfor; ?>
-            </div>
+                <div class="smallInputs">
+                    <?php for ($i = 1; $i <= $duration; $i++): ?>
+                        <div class="form-entry">
+                            <label>Effort (%) Year <?= $i ?>:</label>
+                            <input type="number" name="effort_y<?= $i ?>" min="0" max="100" required>
+                        </div>
+                    <?php endfor; ?>
+                </div>
 
-            <h2>Step 2: Co-Investigators</h2>
-            <div class="form-group" id="co_pi_container"></div>
-            <button type="button" onclick="addCoPI()">Add Co-PI</button>
+                <h2>Step 2: Co-Investigators</h2>
+                <div class="form-group" id="co_pi_container"></div>
+                <button type="button" onclick="addCoPI()">Add Co-PI</button>
 
-            <div>
-                <button type="submit" class="bottom">Next →</button>
+                <div>
+                    <button type="submit" class="bottom">Next →</button>
+                </div>
             </div>
         </div>
-    </div>
-</form>
+    </form>
 
 </body>
+
 </html>
-
-
