@@ -155,6 +155,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
         </div>
     </form>
+    <footer>
+        <div class="footerText">
+            <div class="name">
+                <p>&copy; 2025 Malik Robinson, Ben Givens. All rights reserved.</p>
+            </div>
+            <div class="Links">
+                <p><a href="footerpages/termsandcons.html">Terms and Conditions</a></p>
+                <p><a href="footerpages/privacy.html">Privacy Policy</a></p>
+                <p><a href="footerpages/cookie.html">Cookie Policy</a></p>
+            </div>
+        </div>
+        </div>
+    </footer>
 
 </body>
 

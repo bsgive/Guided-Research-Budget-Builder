@@ -8,8 +8,6 @@ ini_set('display_errors', 1);
 $message = $_SESSION['message'] ?? '';
 unset($_SESSION['message']);
 
-//$id = $_SESSION['personnel'][0]['id'] ?? null;
-//$name = $conn->query("SELECT name FROM faculty_staff where id = $id")->fetch_assoc()['name'] ?? 'Unnamed';
 
 if (isset($_POST['save'])) {
     if (empty($_SESSION['plan'])) {
@@ -17,12 +15,13 @@ if (isset($_POST['save'])) {
     } else {
         $plan = $_SESSION['plan'];
         $duration = $plan['duration'];
+        $user_id = $_SESSION['user_id'] ?? null;
 
         // --- Insert main budget record
-        $stmt = $conn->prepare("INSERT INTO budgets (pi_id, title, start_year, duration_years) VALUES (?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO budgets (user_id, pi_id, title, start_year, duration_years) VALUES (?, ?, ?, ?, ?)");
         if (!$stmt)
             die("Prepare failed (budget): " . $conn->error);
-        $stmt->bind_param("isii", $plan['pi_id'], $plan['title'], $plan['start_year'], $duration);
+        $stmt->bind_param("iisii", $user_id, $plan['pi_id'], $plan['title'], $plan['start_year'], $duration);
         if (!$stmt->execute())
             die("Budget insert error: " . $stmt->error);
         $budget_id = $stmt->insert_id;
@@ -95,7 +94,12 @@ if (isset($_POST['save'])) {
             $stmt->close();
         }
 
-        session_unset();
+        
+        unset($_SESSION['plan']);
+        unset($_SESSION['personnel']);
+        unset($_SESSION['students']);
+        unset($_SESSION['travel']);
+        
         $_SESSION['message'] = "<p style='color:green;'>✅ Budget saved successfully!</p>";
         header("Location: calculate.php?budget_id=$budget_id");
         exit;
@@ -131,6 +135,7 @@ if (isset($_POST['save'])) {
             <a class="link" href="features.html">Features</a>
             <a class="link" href="about.html">About</a>
             <a class="link" href="contact.html">Contact</a>
+            <a class="link" href="budgets.php">Budgets</a>
         </div>
     </div>
 
@@ -206,6 +211,19 @@ if (isset($_POST['save'])) {
         </div>
     </div>
     </div>
+    <footer>
+        <div class="footerText">
+            <div class="name">
+                <p>&copy; 2025 Malik Robinson, Ben Givens. All rights reserved.</p>
+            </div>
+            <div class="Links">
+                <p><a href="footerpages/termsandcons.html">Terms and Conditions</a></p>
+                <p><a href="footerpages/privacy.html">Privacy Policy</a></p>
+                <p><a href="footerpages/cookie.html">Cookie Policy</a></p>
+            </div>
+        </div>
+        </div>
+    </footer>
 </body>
 
 </html>
