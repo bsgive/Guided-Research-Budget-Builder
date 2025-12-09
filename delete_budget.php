@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $budget_id = $_GET['id'] ?? null;
 if (!$budget_id) {
-    $_SESSION['error'] = "Missing budget ID";
+    $_SESSION['error'] = "No budget ID provided";
     header("Location: budgets.php");
     exit;
 }
@@ -24,12 +24,12 @@ $budget = $result->fetch_assoc();
 $stmt->close();
 
 if (!$budget) {
-    $_SESSION['error'] = "Budget not found or you don't have permission to delete it.";
+    $_SESSION['error'] = "Couldn't find that budget or it's not yours";
     header("Location: budgets.php");
     exit;
 }
 
-//Make sure to delete other tables first before main table
+
 $stmt = $conn->prepare("DELETE FROM budget_travel WHERE budget_id = ?");
 $stmt->bind_param("i", $budget_id);
 $stmt->execute();
@@ -49,9 +49,9 @@ $stmt->close();
 $stmt = $conn->prepare("DELETE FROM budgets WHERE id = ?");
 $stmt->bind_param("i", $budget_id);
 if ($stmt->execute()) {
-    $_SESSION['success'] = "Budget deleted successfully.";
+    $_SESSION['success'] = "Budget deleted!";
 } else {
-    $_SESSION['error'] = "Error deleting budget.";
+    $_SESSION['error'] = "Couldn't delete the budget";
 }
 $stmt->close();
 

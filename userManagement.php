@@ -7,17 +7,17 @@ $signupSuccess = '';
 $loginErrors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signup'])) {
-    $name = trim($_POST['name'] ?? '');
-    $email = trim($_POST['email'] ?? '');
+    $name = isset($_POST['name']) ? trim($_POST['name']) : '';
+    $email = trim($_POST['email']);
     $password = $_POST['password'] ?? '';
-    $confirm = $_POST['confirm_password'] ?? '';
+    $confirm = $_POST['confirm_password'];
 
     if ($name === '' || $email === '' || $password === '' || $confirm === '') {
-        $signupErrors[] = "All registration fields are required.";
+        $signupErrors[] = "All fields required.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $signupErrors[] = "Please enter a valid email address.";
+        $signupErrors[] = "Invalid email.";
     } elseif ($password !== $confirm) {
-        $signupErrors[] = "Passwords do not match.";
+        $signupErrors[] = "Passwords don't match.";
     }
 
     if (empty($signupErrors)) {
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signup'])) {
         $stmt->store_result();
 
         if ($stmt->num_rows > 0) {
-            $signupErrors[] = "An account with that email already exists.";
+            $signupErrors[] = "Email already exists.";
         } else {
             $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
@@ -37,20 +37,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signup'])) {
             $stmt->bind_param("sss", $name, $email, $passwordHash);
 
             if ($stmt->execute()) {
-                $signupSuccess = "Account created successfully. You can now sign in.";
+                $signupSuccess = "Account created! You can now sign in.";
             } else {
-                $signupErrors[] = "Error creating account. Please try again.";
+                $signupErrors[] = "Couldn't create account.";
             }
         }
         $stmt->close();
     }
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
-    $email = trim($_POST['login_email'] ?? '');
-    $password = $_POST['login_password'] ?? '';
+    $email = !empty($_POST['login_email']) ? trim($_POST['login_email']) : '';
+    $password = $_POST['login_password'];
 
     if ($email === '' || $password === '') {
-        $loginErrors[] = "Email and password are required.";
+        $loginErrors[] = "Email and password required.";
     } else {
         $stmt = $conn->prepare("SELECT id, name, password FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
@@ -61,13 +61,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             if (password_verify($password, $hash)) {
                 $_SESSION['user_id'] = $userId;
                 $_SESSION['user_name'] = $userName;
-                header("Location: step1_plan.php");
+                $_SESSION['is_admin'] = ($userId == 1);
+                if ($userId == 1) {
+                    header("Location: admin.php");
+                } else {
+                    header("Location: step1_plan.php");
+                }
                 exit;
             } else {
-                $loginErrors[] = "Incorrect email or password.";
+                $loginErrors[] = "Wrong email or password.";
             }
         } else {
-            $loginErrors[] = "Incorrect email or password.";
+            $loginErrors[] = "Wrong email or password.";
         }
 
         $stmt->close();
