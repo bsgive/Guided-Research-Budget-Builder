@@ -2,7 +2,6 @@
 session_start();
 include 'database.php';
 
-// Make sure step1 data exists
 if (!isset($_SESSION['plan'])) {
     header("Location: step1_plan.php");
     exit;
@@ -18,40 +17,43 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bind_param("i", $pi_id);
         $stmt->execute();
         $result = $stmt->get_result();
-        $pi_name = $result->fetch_assoc()['name'] ?? 'Unnamed';
+        $pi_row = $result->fetch_assoc();
+        $pi_name = $pi_row ? $pi_row['name'] : 'Unnamed';
         $stmt->close();
 
         $_SESSION['personnel'][] = [
             'id' => $pi_id,
             'name' => $pi_name,
-            'effort_y1' => $_POST['effort_y1'] ?? 0,
-            'effort_y2' => $_POST['effort_y2'] ?? 0,
-            'effort_y3' => $_POST['effort_y3'] ?? 0,
-            'effort_y4' => $_POST['effort_y4'] ?? 0,
-            'effort_y5' => $_POST['effort_y5'] ?? 0,
+            'effort_y1' => isset($_POST['effort_y1']) ? $_POST['effort_y1'] : 0,
+            'effort_y2' => isset($_POST['effort_y2']) ? $_POST['effort_y2'] : 0,
+            'effort_y3' => !empty($_POST['effort_y3']) ? $_POST['effort_y3'] : 0,
+            'effort_y4' => isset($_POST['effort_y4']) ? $_POST['effort_y4'] : 0,
+            'effort_y5' => isset($_POST['effort_y5']) ? $_POST['effort_y5'] : 0,
         ];
         $_SESSION['plan']['pi_id'] = $_POST['pi_id'];
     }
     if (!empty($_POST['co_pis']) && is_array($_POST['co_pis'])) {
         foreach ($_POST['co_pis'] as $c) {
-            if (empty($c['id']))
+            if (empty($c['id'])) {
                 continue;
+            }
             $co_id = (int) $c['id'];
             $stmt = $conn->prepare("SELECT name FROM faculty_staff WHERE id = ?");
             $stmt->bind_param("i", $co_id);
             $stmt->execute();
             $res = $stmt->get_result();
-            $co_name = $res->fetch_assoc()['name'] ?? 'Unnamed';
+            $co_data = $res->fetch_assoc();
+            $co_name = isset($co_data['name']) ? $co_data['name'] : 'Unnamed';
             $stmt->close();
 
             $_SESSION['personnel'][] = [
                 'id' => $co_id,
                 'name' => $co_name,
-                'effort_y1' => $c['effort_y1'] ?? 0,
-                'effort_y2' => $c['effort_y2'] ?? 0,
-                'effort_y3' => $c['effort_y3'] ?? 0,
-                'effort_y4' => $c['effort_y4'] ?? 0,
-                'effort_y5' => $c['effort_y5'] ?? 0,
+                'effort_y1' => isset($c['effort_y1']) ? $c['effort_y1'] : 0,
+                'effort_y2' => !empty($c['effort_y2']) ? $c['effort_y2'] : 0,
+                'effort_y3' => isset($c['effort_y3']) ? $c['effort_y3'] : 0,
+                'effort_y4' => isset($c['effort_y4']) ? $c['effort_y4'] : 0,
+                'effort_y5' => isset($c['effort_y5']) ? $c['effort_y5'] : 0,
             ];
         }
     }
@@ -60,8 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     exit;
 }
 ?>
-
-
 <!DOCTYPE html>
 <html>
 

@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $userId = $_SESSION['user_id'];
-$userName = $_SESSION['user_name'] ?? 'User';
+$userName = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'User';
 
 $stmt = $conn->prepare("
     SELECT id, title, start_year, duration_years, created_at

@@ -3,31 +3,28 @@ session_start();
 include 'database.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-    if (!empty($_POST['student_id']) && isset($_POST['fte'])) {
-
-        $fte = floatval($_POST['fte']);
-        if ($fte > 50) {
-            $fte = 50;
-        }
-
-
-        $_SESSION['students'] = [
-            [
-                'student_id' => $_POST['student_id'],
+    $_SESSION['students'] = [];
+    
+    if (!empty($_POST['students']) && is_array($_POST['students'])) {
+        foreach ($_POST['students'] as $s) {
+            if (empty($s['student_id'])) {
+                continue;
+            }
+            
+            $fte = isset($s['fte']) ? floatval($s['fte']) : 0;
+            if ($fte > 50) {
+                $fte = 50;
+            }
+            
+            $_SESSION['students'][] = [
+                'student_id' => $s['student_id'],
                 'fte' => $fte
-            ]
-        ];
-
-
-        header("Location: step4_travel.php");
-        exit;
-
-    } else {
-        $_SESSION['students'] = [];
-        header("Location: step4_travel.php");
-        exit;
+            ];
+        }
     }
+    
+    header("Location: step4_travel.php");
+    exit;
 }
 ?>
 
@@ -35,6 +32,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <html>
 
 <head>
+    <script>
+        function addStudent() {
+            const container = document.getElementById('student_container');
+            const index = container.children.length + 1;
+
+            let html = `<div class="co_pi_block">
+        <label>Student:</label>
+        <select name="students[${index}][student_id]" required>
+            <option value="">-- Select Student --</option>
+            <?php
+            $students_js = $conn->query("SELECT sid, name FROM students ORDER BY name");
+            while ($row = $students_js->fetch_assoc()) {
+                echo "document.write('<option value=\"{$row['sid']}\">{$row['name']}</option>');";}
+            ?>
+        </select>
+        <label>FTE (max 50%):</label>
+        <input type="number" name="students[${index}][fte]" min="0" max="50" required>
+        <button type="button" onclick="this.parentElement.remove()">Remove Student</button>
+    </div>`;
+
+            container.insertAdjacentHTML('beforeend', html);
+        }
+    </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Home — My Website</title>
@@ -70,8 +90,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         ?>
         <form action="step3_students.php" method="POST" class="form-group">
             <div class="form-entry">
-                <label for="student_id">Student:</label>
-                <select name="student_id" id="student_id">
+                <label>Student:</label>
+                <select name="students[0][student_id]">
                     <option value="">-- Select Student --</option>
                     <?php
                     $students = $conn->query("SELECT sid, name FROM students ORDER BY name");
@@ -83,7 +103,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
             <div class="form-entry">
                 <label>FTE (max 50%):</label>
-                <input type="number" name="fte" max="50" min="0">
+                <input type="number" name="students[0][fte]" max="50" min="0">
+            </div>
+            
+            <div id="student_container"></div>
+            
+            <div class="form-entry">
+                <button type="button" onclick="addStudent()">+ Add Another Student</button>
             </div>
             <div class="form-entry">
                 <button type="submit" class="bottom">Next →</button>

@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-$budget_id = $_GET['id'] ?? null;
+$budget_id = isset($_GET['id']) ? $_GET['id'] : null;
 if (!$budget_id) {
     $_SESSION['error'] = "No budget ID provided";
     header("Location: budgets.php");

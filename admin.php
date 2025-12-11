@@ -31,12 +31,12 @@ if (isset($_GET['delete_user'])) {
         $stmt->close();
     }
 }
-
 //Delete Faculty
 if (isset($_GET['delete_faculty'])) {
     $facultyId = (int)$_GET['delete_faculty'];
     $stmt = $conn->prepare("DELETE FROM faculty_staff WHERE id = ?");
     $stmt->bind_param("i", $facultyId);
+
     if ($stmt->execute()) {
         $deleteMessage = "Faculty deleted successfully.";
     } else {
@@ -44,7 +44,6 @@ if (isset($_GET['delete_faculty'])) {
     }
     $stmt->close();
 }
-
 //Delete Student
 if (isset($_GET['delete_student'])) {
     $studentId = (int)$_GET['delete_student'];
@@ -60,7 +59,7 @@ if (isset($_GET['delete_student'])) {
 //Add User
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_add_user'])) {
     $name = isset($_POST['admin_name']) ? trim($_POST['admin_name']) : '';
-    $email = trim($_POST['admin_email'] ?? '');
+    $email = isset($_POST['admin_email']) ? trim($_POST['admin_email']) : '';
     $password = $_POST['admin_password'];
 
     if ($name === '' || $email === '' || $password === '') {
@@ -98,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_add_user'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_add_faculty'])) {
     $name = !empty($_POST['faculty_name']) ? trim($_POST['faculty_name']) : '';
     $base_salary = trim($_POST['faculty_salary']);
-    $position = $_POST['faculty_position'] ?? '';
+    $position = isset($_POST['faculty_position']) ? $_POST['faculty_position'] : '';
 
     if (empty($name)) {
         $facultyAddErrors[] = "Name required.";
@@ -321,8 +320,8 @@ $studentsResult = $conn->query("SELECT sid, name, residency_status FROM students
                                 <tr>
                                     <td><?php echo htmlspecialchars($faculty['id']); ?></td>
                                     <td><?php echo htmlspecialchars($faculty['name']); ?></td>
-                                    <td><?php echo htmlspecialchars($faculty['position'] ?? 'N/A'); ?></td>
-                                    <td>$<?php echo number_format($faculty['base_salary'] ?? 0, 2); ?></td>
+                                    <td><?php echo htmlspecialchars(isset($faculty['position']) ? $faculty['position'] : 'N/A'); ?></td>
+                                    <td>$<?php echo number_format(isset($faculty['base_salary']) ? $faculty['base_salary'] : 0, 2); ?></td>
                                     <td>
                                         <a href="admin.php?delete_faculty=<?php echo $faculty['id']; ?>" 
                                         onclick="return confirm('Are you sure you want to delete this faculty member?');" 
@@ -352,9 +351,8 @@ $studentsResult = $conn->query("SELECT sid, name, residency_status FROM students
                             <label for="student_residency">Residency Status:</label>
                             <select id="student_residency" name="student_residency" required>
                                 <option value="">-- Select Residency --</option>
-                                <option value="In-State">In-State</option>
-                                <option value="Out-of-State">Out-of-State</option>
-                                <option value="International">International</option>
+                                <option value="in-state">In-State</option>
+                                <option value="out-of-state">Out-of-State</option>
                             </select>
                         </div>
 
@@ -391,7 +389,7 @@ $studentsResult = $conn->query("SELECT sid, name, residency_status FROM students
                                 <tr>
                                     <td><?php echo htmlspecialchars($student['sid']); ?></td>
                                     <td><?php echo htmlspecialchars($student['name']); ?></td>
-                                    <td><?php echo htmlspecialchars($student['residency_status'] ?? 'N/A'); ?></td>
+                                    <td><?php echo htmlspecialchars(isset($student['residency_status']) ? $student['residency_status'] : 'N/A'); ?></td>
                                     <td>
                                         <a href="admin.php?delete_student=<?php echo $student['sid']; ?>" 
                                         onclick="return confirm('Are you sure you want to delete this student?');" 

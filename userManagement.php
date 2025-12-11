@@ -9,7 +9,7 @@ $loginErrors = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signup'])) {
     $name = isset($_POST['name']) ? trim($_POST['name']) : '';
     $email = trim($_POST['email']);
-    $password = $_POST['password'] ?? '';
+    $password = isset($_POST['password']) ? $_POST['password'] : '';
     $confirm = $_POST['confirm_password'];
 
     if ($name === '' || $email === '' || $password === '' || $confirm === '') {

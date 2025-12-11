@@ -17,7 +17,7 @@ if (isset($_POST['save'])) {
         $duration = $plan['duration'];
         $user_id = $_SESSION['user_id'] ?? null;
 
-        // --- Insert main budget record
+        //Insert main budget record
         $stmt = $conn->prepare("INSERT INTO budgets (user_id, pi_id, title, start_year, duration_years) VALUES (?, ?, ?, ?, ?)");
         if (!$stmt)
             die("Prepare failed (budget): " . $conn->error);
@@ -27,7 +27,7 @@ if (isset($_POST['save'])) {
         $budget_id = $stmt->insert_id;
         $stmt->close();
 
-        // --- Insert personnel (PI and other personnel)
+        //Insert personnel (PI and other personnel)
         if (!empty($_SESSION['personnel'])) {
             foreach ($_SESSION['personnel'] as $p) {
 
@@ -57,7 +57,7 @@ if (isset($_POST['save'])) {
             }
         }
 
-        // --- Insert students
+        //Insert students
         if (!empty($_SESSION['students'])) {
             $stmt = $conn->prepare("INSERT INTO budget_students (budget_id, student_id, fte) VALUES (?, ?, ?)");
             if (!$stmt)
@@ -76,7 +76,7 @@ if (isset($_POST['save'])) {
             $stmt->close();
         }
 
-        // --- Insert travel
+        //Insert travel
         if (!empty($_SESSION['travel'])) {
             $stmt = $conn->prepare("INSERT INTO budget_travel (budget_id, travel_type_id, trips, days) VALUES (?, ?, ?, ?)");
             if (!$stmt)

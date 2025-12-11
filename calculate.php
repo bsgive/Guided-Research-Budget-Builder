@@ -6,40 +6,30 @@ require 'database.php';
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-$budgetId = $_GET['budget_id'] ?? null;
-if (!$budgetId) die("Missing budget_id");
+$budgetId = isset($_GET['budget_id']) ? $_GET['budget_id'] : null;
+if (!$budgetId) {
+    die("Missing budget_id");
+}
 
-
-
-//get values for calcs
 function fetchAll($conn, $sql, $params = [])
 {
     $stmt = $conn->prepare($sql);
-    if (!$stmt) {
-        die("SQL error: " . $conn->error);
-    }
-
     if (!empty($params)) {
-        $types = str_repeat("i", count($params)); 
+        $types = str_repeat("i", count($params));
         $stmt->bind_param($types, ...$params);
     }
-
     $stmt->execute();
-    $result = $stmt->get_result();
-
-    $rows = $result->fetch_all(MYSQLI_ASSOC);
+    $rows = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     $stmt->close();
-
     return $rows;
 }
 
-//get budget
+//budget
 $budget = fetchAll($conn, "SELECT * FROM budgets WHERE id = ?", [$budgetId])[0];
-
 $startYear = $budget['start_year'];
 $duration  = $budget['duration_years'];
 
-// salery info
+//personnel
 $personnel = fetchAll(
     $conn,
     "SELECT bp.*, fs.name, fs.base_salary
@@ -49,7 +39,7 @@ $personnel = fetchAll(
     [$budgetId]
 );
 
-// fringe rates
+//fringe rates
 $fringeRows = fetchAll($conn, "SELECT year, rate_percent FROM fringe_rates");
 $fringeRates = [];
 foreach ($fringeRows as $r) {
@@ -57,18 +47,15 @@ foreach ($fringeRows as $r) {
 }
 
 $personnelCalc = [];
+$personnelTotals = [];
 
 foreach ($personnel as $p) {
-
     for ($y = 1; $y <= $duration; $y++) {
         $year = $startYear + $y - 1;
-
-        $effortField = "effort_y$y";
-        $effort = ($p[$effortField] ?? 0) / 100;
+        $effort = (isset($p["effort_y$y"]) ? $p["effort_y$y"] : 0) / 100;
 
         $salary = $p['base_salary'] * $effort;
-        $fringeRate = $fringeRates[$year] ?? 0;
-        $fringe = $salary * $fringeRate;
+        $fringe = $salary * (isset($fringeRates[$year]) ? $fringeRates[$year] : 0);
 
         $personnelCalc[] = [
             'name'   => $p['name'],
@@ -76,11 +63,12 @@ foreach ($personnel as $p) {
             'salary' => $salary,
             'fringe' => $fringe
         ];
+
+        $personnelTotals[$year] = (isset($personnelTotals[$year]) ? $personnelTotals[$year] : 0) + $salary + $fringe;
     }
 }
 
-
-// student info
+//students
 $students = fetchAll(
     $conn,
     "SELECT bs.*, s.name, s.residency_status, bs.fte
@@ -93,24 +81,24 @@ $students = fetchAll(
 $tuitionRows = fetchAll($conn, "SELECT * FROM tuition_fees");
 
 $tuitionCalc = [];
+$tuitionTotals = [];
 
 foreach ($students as $s) {
     foreach ($tuitionRows as $t) {
         if ($s['residency_status'] == $t['residency_status']) {
-
-            $totalTuition = ($t['tuition_amount'] + $t['fees']) * $s['fte'];
+            $totalTuition = (($t['tuition_amount'] + $t['fees']) * $s['fte']) / 100;
 
             $tuitionCalc[] = [
                 'name' => $s['name'],
                 'year' => $t['year'],
                 'tuition' => $totalTuition
             ];
+            $tuitionTotals[$t['year']] = (isset($tuitionTotals[$t['year']]) ? $tuitionTotals[$t['year']] : 0) + $totalTuition;
         }
     }
 }
 
-
-// travel info
+//travel
 $travel = fetchAll(
     $conn,
     "SELECT bt.*, tp.type, tp.per_diem, tp.airfare_estimate, tp.lodging_cap
@@ -121,6 +109,7 @@ $travel = fetchAll(
 );
 
 $travelCalc = [];
+$travelTotal = 0;
 
 foreach ($travel as $t) {
     $singleTripCost =
@@ -134,69 +123,106 @@ foreach ($travel as $t) {
         'trips' => $t['trips'],
         'cost'  => $total
     ];
+
+    $travelTotal += $total;
 }
 
-
-// F&A rates
+//F and A
 $faRows = fetchAll($conn, "SELECT * FROM f_and_a_rates");
-
 $faRates = [];
-foreach ($faRows as $row) {
-    $faRates[$row['year']] = $row['rate_percent'] / 100;
-}
+foreach ($faRows as $row) $faRates[$row['year']] = $row['rate_percent'] / 100;
 
 $faCalc = [];
+$faTotals = [];
 
 foreach ($personnelCalc as $pc) {
     $year = $pc['year'];
     $subtotal = $pc['salary'] + $pc['fringe'];
-
-    $faRate = $faRates[$year] ?? 0;
+    $fa = $subtotal * (isset($faRates[$year]) ? $faRates[$year] : 0);
 
     $faCalc[] = [
         'year' => $year,
-        'fa'   => $subtotal * $faRate
+        'fa'   => $fa
     ];
-}
 
+    $faTotals[$year] = (isset($faTotals[$year]) ? $faTotals[$year] : 0) + $fa;
+}
 
 $spreadsheet = new Spreadsheet();
 $sheet = $spreadsheet->getActiveSheet();
-$sheet->setTitle("Budget Preview");
+$sheet->setTitle("Budget Export");
 
 $sheet->fromArray(['Category', 'Name/Type', 'Year', 'Amount'], null, 'A1');
-
 $row = 2;
 
-// Personnel rows
+//PERSONNEL
 foreach ($personnelCalc as $p) {
-    $sheet->fromArray(['Personnel Salary', $p['name'], $p['year'], $p['salary']], null, "A$row");
-    $row++;
-    $sheet->fromArray(['Personnel Fringe', $p['name'], $p['year'], $p['fringe']], null, "A$row");
+    $sheet->fromArray(['Personnel Salary', $p['name'], $p['year'], $p['salary']], null, "A$row"); $row++;
+    $sheet->fromArray(['Personnel Fringe', $p['name'], $p['year'], $p['fringe']], null, "A$row"); $row++;
+}
+
+//PERSONNEL TOTALS
+foreach ($personnelTotals as $yr => $total) {
+    $sheet->fromArray(['TOTAL Personnel', '', $yr, $total], null, "A$row");
+    $sheet->getStyle("A$row:D$row")->getFont()->setBold(true);
     $row++;
 }
 
-// Student tuition
+//STUDENT TUITION
 foreach ($tuitionCalc as $t) {
     $sheet->fromArray(['Student Tuition', $t['name'], $t['year'], $t['tuition']], null, "A$row");
     $row++;
 }
 
-// Travel
+//TUITION TOTALS
+foreach ($tuitionTotals as $yr => $total) {
+    $sheet->fromArray(['TOTAL Tuition', '', $yr, $total], null, "A$row");
+    $sheet->getStyle("A$row:D$row")->getFont()->setBold(true);
+    $row++;
+}
+
+//TRAVEL
 foreach ($travelCalc as $t) {
     $sheet->fromArray(['Travel', $t['type'], '-', $t['cost']], null, "A$row");
     $row++;
 }
+$sheet->fromArray(['TOTAL Travel', '', '-', $travelTotal], null, "A$row");
+$sheet->getStyle("A$row:D$row")->getFont()->setBold(true);
+$row++;
 
-// F&A
+//F and A
 foreach ($faCalc as $f) {
     $sheet->fromArray(['F&A', 'Indirect Costs', $f['year'], $f['fa']], null, "A$row");
     $row++;
 }
 
+//F and A TOTALS
+foreach ($faTotals as $yr => $total) {
+    $sheet->fromArray(['TOTAL F&A', '', $yr, $total], null, "A$row");
+    $sheet->getStyle("A$row:D$row")->getFont()->setBold(true);
+    $row++;
+}
+
+//GRAND TOTAL
+$totalSum =
+    array_sum($personnelTotals) +
+    array_sum($tuitionTotals) +
+    $travelTotal +
+    array_sum($faTotals);
+
+$row++;
+$sheet->fromArray(['GRAND TOTAL', '', '', $totalSum], null, "A$row");
+$sheet->getStyle("A$row:D$row")->getFont()->setBold(true);
+$sheet->getStyle("D$row")->getFont()->setSize(14);
+
+foreach (['A','B','C','D'] as $col) {
+    $sheet->getColumnDimension($col)->setAutoSize(true);
+}
+
+$sheet->getStyle("D2:D$row")->getNumberFormat()->setFormatCode('#,##0.00');
+
 $filename = "budget_export_{$budgetId}.xlsx";
 ob_end_clean();
-
 header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 header("Content-Disposition: attachment; filename=\"$filename\"");
 header("Cache-Control: max-age=0");
@@ -204,6 +230,4 @@ header("Cache-Control: max-age=0");
 $writer = new Xlsx($spreadsheet);
 $writer->save("php://output");
 exit;
-
 ?>
-
