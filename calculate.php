@@ -85,7 +85,10 @@ $tuitionTotals = [];
 
 foreach ($students as $s) {
     foreach ($tuitionRows as $t) {
-        if ($s['residency_status'] == $t['residency_status']) {
+        // Only include tuition for years within the budget duration
+        if ($s['residency_status'] == $t['residency_status'] && 
+            $t['year'] >= $startYear && 
+            $t['year'] < ($startYear + $duration)) {
             $totalTuition = (($t['tuition_amount'] + $t['fees']) * $s['fte']) / 100;
 
             $tuitionCalc[] = [
