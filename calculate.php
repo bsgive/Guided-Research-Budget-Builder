@@ -1,15 +1,16 @@
 <?php
 ob_clean();
 ob_start();
+
+require 'vendor/autoload.php';
 require 'vendor/autoload.php';
 require 'database.php';
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-$budgetId = isset($_GET['budget_id']) ? $_GET['budget_id'] : null;
-if (!$budgetId) {
-    die("Missing budget_id");
-}
+$budgetId = $_GET['budget_id'] ?? null;
+if (!$budgetId) die("Missing budget_id");
 
 function fetchAll($conn, $sql, $params = [])
 {
@@ -42,9 +43,7 @@ $personnel = fetchAll(
 //fringe rates
 $fringeRows = fetchAll($conn, "SELECT year, rate_percent FROM fringe_rates");
 $fringeRates = [];
-foreach ($fringeRows as $r) {
-    $fringeRates[$r['year']] = $r['rate_percent'] / 100;
-}
+foreach ($fringeRows as $r) $fringeRates[$r['year']] = $r['rate_percent'] / 100;
 
 $personnelCalc = [];
 $personnelTotals = [];
@@ -52,10 +51,10 @@ $personnelTotals = [];
 foreach ($personnel as $p) {
     for ($y = 1; $y <= $duration; $y++) {
         $year = $startYear + $y - 1;
-        $effort = (isset($p["effort_y$y"]) ? $p["effort_y$y"] : 0) / 100;
+        $effort = ($p["effort_y$y"] ?? 0) / 100;
 
         $salary = $p['base_salary'] * $effort;
-        $fringe = $salary * (isset($fringeRates[$year]) ? $fringeRates[$year] : 0);
+        $fringe = $salary * ($fringeRates[$year] ?? 0);
 
         $personnelCalc[] = [
             'name'   => $p['name'],
@@ -64,7 +63,7 @@ foreach ($personnel as $p) {
             'fringe' => $fringe
         ];
 
-        $personnelTotals[$year] = (isset($personnelTotals[$year]) ? $personnelTotals[$year] : 0) + $salary + $fringe;
+        $personnelTotals[$year] = ($personnelTotals[$year] ?? 0) + $salary + $fringe;
     }
 }
 
@@ -85,18 +84,15 @@ $tuitionTotals = [];
 
 foreach ($students as $s) {
     foreach ($tuitionRows as $t) {
-        // Only include tuition for years within the budget duration
-        if ($s['residency_status'] == $t['residency_status'] && 
-            $t['year'] >= $startYear && 
-            $t['year'] < ($startYear + $duration)) {
-            $totalTuition = (($t['tuition_amount'] + $t['fees']) * $s['fte']) / 100;
+        if ($s['residency_status'] == $t['residency_status']) {
+            $totalTuition = ($t['tuition_amount'] + $t['fees']) * ($s['fte'] / 100);
 
             $tuitionCalc[] = [
                 'name' => $s['name'],
                 'year' => $t['year'],
                 'tuition' => $totalTuition
             ];
-            $tuitionTotals[$t['year']] = (isset($tuitionTotals[$t['year']]) ? $tuitionTotals[$t['year']] : 0) + $totalTuition;
+            $tuitionTotals[$t['year']] = ($tuitionTotals[$t['year']] ?? 0) + $totalTuition;
         }
     }
 }
@@ -141,96 +137,181 @@ $faTotals = [];
 foreach ($personnelCalc as $pc) {
     $year = $pc['year'];
     $subtotal = $pc['salary'] + $pc['fringe'];
-    $fa = $subtotal * (isset($faRates[$year]) ? $faRates[$year] : 0);
+    $fa = $subtotal * ($faRates[$year] ?? 0);
 
     $faCalc[] = [
         'year' => $year,
         'fa'   => $fa
     ];
 
-    $faTotals[$year] = (isset($faTotals[$year]) ? $faTotals[$year] : 0) + $fa;
+    $faTotals[$year] = ($faTotals[$year] ?? 0) + $fa;
+}
+
+$years = [];
+
+for ($i = 0; $i < $duration; $i++) {
+    $years[] = $startYear + $i;
 }
 
 $spreadsheet = new Spreadsheet();
 $sheet = $spreadsheet->getActiveSheet();
-$sheet->setTitle("Budget Export");
+$sheet->setTitle('Budget Export');
 
-$sheet->fromArray(['Category', 'Name/Type', 'Year', 'Amount'], null, 'A1');
+$header = array_merge(['Category', 'Name/Type'], $years);
+$sheet->fromArray($header, null, 'A1');
+
 $row = 2;
 
-//PERSONNEL
+$yearCols = [];
+$colIndex = 3; 
+
+foreach ($years as $yr) {
+    $yearCols[$yr] = Coordinate::stringFromColumnIndex($colIndex++);
+}
+
+$personnelRows = [];
+
 foreach ($personnelCalc as $p) {
-    $sheet->fromArray(['Personnel Salary', $p['name'], $p['year'], $p['salary']], null, "A$row"); $row++;
-    $sheet->fromArray(['Personnel Fringe', $p['name'], $p['year'], $p['fringe']], null, "A$row"); $row++;
+
+    if (!isset($yearCols[$p['year']])) {
+        continue;
+    }
+
+    $personnelRows["Personnel Salary|{$p['name']}"][$p['year']] = $p['salary'];
+    $personnelRows["Personnel Fringe|{$p['name']}"][$p['year']] = $p['fringe'];
 }
 
-//PERSONNEL TOTALS
-foreach ($personnelTotals as $yr => $total) {
-    $sheet->fromArray(['TOTAL Personnel', '', $yr, $total], null, "A$row");
-    $sheet->getStyle("A$row:D$row")->getFont()->setBold(true);
+foreach ($personnelRows as $key => $values) {
+    [$category, $name] = explode('|', $key);
+
+    $sheet->setCellValue("A$row", $category);
+    $sheet->setCellValue("B$row", $name);
+
+    foreach ($values as $yr => $amt) {
+        $sheet->setCellValue($yearCols[$yr] . $row, $amt);
+    }
     $row++;
 }
 
-//STUDENT TUITION
+//personnel totals
+$sheet->setCellValue("A$row", "TOTAL Personnel");
+foreach ($years as $yr) {
+    $sheet->setCellValue(
+        $yearCols[$yr] . $row,
+        $personnelTotals[$yr] ?? 0
+    );
+}
+
+$sheet->getStyle("A$row:" . end($yearCols) . $row)->getFont()->setBold(true);
+$row++;
+
+$tuitionRows = [];
+
 foreach ($tuitionCalc as $t) {
-    $sheet->fromArray(['Student Tuition', $t['name'], $t['year'], $t['tuition']], null, "A$row");
+
+    if (!isset($yearCols[$t['year']])) {
+        continue;
+    }
+
+    $tuitionRows[$t['name']][$t['year']] = $t['tuition'];
+}
+
+foreach ($tuitionRows as $name => $values) {
+    $sheet->setCellValue("A$row", "Student Tuition");
+    $sheet->setCellValue("B$row", $name);
+
+    foreach ($values as $yr => $amt) {
+        $sheet->setCellValue($yearCols[$yr] . $row, $amt);
+    }
     $row++;
 }
 
-//TUITION TOTALS
-foreach ($tuitionTotals as $yr => $total) {
-    $sheet->fromArray(['TOTAL Tuition', '', $yr, $total], null, "A$row");
-    $sheet->getStyle("A$row:D$row")->getFont()->setBold(true);
-    $row++;
+//tuition totals
+$sheet->setCellValue("A$row", "TOTAL Tuition");
+foreach ($years as $yr) {
+    $sheet->setCellValue(
+        $yearCols[$yr] . $row,
+        $tuitionTotals[$yr] ?? 0
+    );
 }
 
-//TRAVEL
+$sheet->getStyle("A$row:" . end($yearCols) . $row)->getFont()->setBold(true);
+$row++;
+
+//travel
+$firstYearCol = reset($yearCols);
+
 foreach ($travelCalc as $t) {
-    $sheet->fromArray(['Travel', $t['type'], '-', $t['cost']], null, "A$row");
+    $sheet->setCellValue("A$row", "Travel");
+    $sheet->setCellValue("B$row", $t['type']);
+    $sheet->setCellValue($firstYearCol . $row, $t['cost']);
     $row++;
 }
-$sheet->fromArray(['TOTAL Travel', '', '-', $travelTotal], null, "A$row");
-$sheet->getStyle("A$row:D$row")->getFont()->setBold(true);
+
+$sheet->setCellValue("A$row", "TOTAL Travel");
+$sheet->setCellValue($firstYearCol . $row, $travelTotal);
+$sheet->getStyle("A$row:" . end($yearCols) . $row)->getFont()->setBold(true);
 $row++;
 
-//F and A
 foreach ($faCalc as $f) {
-    $sheet->fromArray(['F&A', 'Indirect Costs', $f['year'], $f['fa']], null, "A$row");
+
+    if (!isset($yearCols[$f['year']])) {
+        continue;
+    }
+
+    $sheet->setCellValue("A$row", "F&A");
+    $sheet->setCellValue("B$row", "Indirect Costs");
+    $sheet->setCellValue($yearCols[$f['year']] . $row, $f['fa']);
     $row++;
 }
 
-//F and A TOTALS
-foreach ($faTotals as $yr => $total) {
-    $sheet->fromArray(['TOTAL F&A', '', $yr, $total], null, "A$row");
-    $sheet->getStyle("A$row:D$row")->getFont()->setBold(true);
-    $row++;
+//F and A Totals
+$sheet->setCellValue("A$row", "TOTAL F&A");
+foreach ($years as $yr) {
+    $sheet->setCellValue(
+        $yearCols[$yr] . $row,
+        $faTotals[$yr] ?? 0
+    );
 }
 
-//GRAND TOTAL
-$totalSum =
-    array_sum($personnelTotals) +
-    array_sum($tuitionTotals) +
-    $travelTotal +
-    array_sum($faTotals);
-
+$sheet->getStyle("A$row:" . end($yearCols) . $row)->getFont()->setBold(true);
 $row++;
-$sheet->fromArray(['GRAND TOTAL', '', '', $totalSum], null, "A$row");
-$sheet->getStyle("A$row:D$row")->getFont()->setBold(true);
-$sheet->getStyle("D$row")->getFont()->setSize(14);
 
-foreach (['A','B','C','D'] as $col) {
+//Grand Total
+$sheet->setCellValue("A$row", "GRAND TOTAL");
+
+foreach ($years as $yr) {
+    $sum =
+        ($personnelTotals[$yr] ?? 0) +
+        ($tuitionTotals[$yr] ?? 0) +
+        ($faTotals[$yr] ?? 0);
+    if ($yr === $years[0]) {
+        $sum += $travelTotal;
+    }
+
+    $sheet->setCellValue($yearCols[$yr] . $row, $sum);
+}
+
+$sheet->getStyle("A$row:" . end($yearCols) . $row)->getFont()->setBold(true);
+$sheet->getStyle($yearCols[$years[0]] . $row)->getFont()->setSize(14);
+
+foreach (range('A', end($yearCols)) as $col) {
     $sheet->getColumnDimension($col)->setAutoSize(true);
 }
 
-$sheet->getStyle("D2:D$row")->getNumberFormat()->setFormatCode('#,##0.00');
+$sheet->getStyle(
+    "C2:" . end($yearCols) . $row
+)->getNumberFormat()->setFormatCode('#,##0.00');
 
 $filename = "budget_export_{$budgetId}.xlsx";
+
 ob_end_clean();
 header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 header("Content-Disposition: attachment; filename=\"$filename\"");
 header("Cache-Control: max-age=0");
 
 $writer = new Xlsx($spreadsheet);
-$writer->save("php://output");
+$writer->save('php://output');
 exit;
+
 ?>
